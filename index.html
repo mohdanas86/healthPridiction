@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthBuddy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="min-h-screen w-full flex items-center justify-center p-6">
+    <div class="bg-white  p-8 w-full flex justify-around items-start">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">HealthBuddy: Check Your Health Risk</h1>
+
+            <!-- Input Form -->
+            <form id="health-form" class="space-y-4">
+                <div>
+                    <label for="age" class="block text-sm font-medium text-gray-700">Age</label>
+                    <input type="number" id="age"
+                        class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        required>
+                </div>
+                <div>
+                    <label for="bmi" class="block text-sm font-medium text-gray-700">BMI</label>
+                    <input type="number" id="bmi"
+                        class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        required>
+                </div>
+                <div>
+                    <label for="glucose" class="block text-sm font-medium text-gray-700">Glucose Level</label>
+                    <input type="number" id="glucose"
+                        class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        required>
+                </div>
+                <button type="submit"
+                    class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Predict Risk
+                </button>
+            </form>
+        </div>
+
+        <div class="w-[40%]">
+            <!-- Result Display -->
+            <div id="result" class="mt-4 text-lg text-gray-700 font-semibold"></div>
+        
+            <!-- Visualization Table -->
+            <h2 class="text-xl font-bold text-gray-800 mt-6">Your Data</h2>
+            <div>
+                <table id="data-table" class="mt-4 w-full text-left border-collapse border border-gray-300">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="border border-gray-300 px-4 py-2">Age</th>
+                            <th class="border border-gray-300 px-4 py-2">BMI</th>
+                            <th class="border border-gray-300 px-4 py-2">Glucose</th>
+                            <th class="border border-gray-300 px-4 py-2">Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="overflow-x-scroll">
+                        <!-- Data rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        
+            <!-- Chart -->
+            <h2 class="text-xl font-bold text-gray-800 mt-6">Risk Chart</h2>
+            <div class="overflow-x-auto">
+                <canvas id="riskChart" class="mt-6 w-full"></canvas>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- JavaScript Section -->
+    <script>
+        const form = document.getElementById("health-form");
+        const tableBody = document.querySelector("#data-table tbody");
+        const chartContext = document.getElementById("riskChart").getContext("2d");
+
+        // Initialize the chart
+        const riskChart = new Chart(chartContext, {
+            type: 'bar',
+            data: {
+                labels: [], // Age labels
+                datasets: [{
+                    label: 'Risk Levels',
+                    data: [], // Risk levels
+                    backgroundColor: ['#FF6384', '#FFCE56', '#36A2EB'], // Colors for risks
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true },
+                }
+            }
+        });
+
+        // Handle form submission
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            // Collect user input data
+            const data = {
+                age: document.getElementById("age").value,
+                bmi: document.getElementById("bmi").value,
+                glucose: document.getElementById("glucose").value,
+            };
+
+            // Send the data to the backend
+            const response = await fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+    if (result.risk_level) {
+        document.getElementById("result").innerText = 
+            `Risk Level: ${result.risk_level} (Probability: ${(result.probability * 100).toFixed(2)}%)`;
+    } else {
+        document.getElementById("result").innerText = 
+            `Error: ${result.error}`;
+    }
+
+            // const result = await response.json();
+            const riskLevel = result.risk_level || `Error: ${result.error}`;
+
+            // Display the risk level result
+            document.getElementById("result").innerText = `Risk Level: ${riskLevel}`;
+
+            // Add data to the table
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td class="border border-gray-300 px-4 py-2">${data.age}</td>
+                <td class="border border-gray-300 px-4 py-2">${data.bmi}</td>
+                <td class="border border-gray-300 px-4 py-2">${data.glucose}</td>
+                <td class="border border-gray-300 px-4 py-2">${riskLevel}</td>
+            `;
+            tableBody.appendChild(newRow);
+
+            // Convert risk level to numeric for chart representation
+            // Map risk levels to numeric values for the chart
+            let numericRisk;
+            if (riskLevel === "High") {
+                numericRisk = 1; // High
+            } else if (riskLevel === "Medium") {
+                numericRisk = 0.5; // Medium
+            } else {
+                numericRisk = 0.1; // Low (small bar)
+            }
+
+            // Update the chart with new data
+            riskChart.data.labels.push(`Age ${data.age}`);
+            riskChart.data.datasets[0].data.push(numericRisk);
+            riskChart.update();
+
+        });
+    </script>
+</body>
+
+</html>

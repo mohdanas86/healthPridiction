@@ -1,0 +1,12 @@
+import os
+import joblib
+
+# Create directory if it doesn't exist
+directory = "../models"
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+# Save the trained model
+filepath = os.path.join(directory, "trained_model.pkl")
+joblib.dump(model, filepath)
+print(f"Model saved to {filepath}")

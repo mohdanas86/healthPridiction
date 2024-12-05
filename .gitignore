@@ -1,0 +1,90 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environment files
+.env
+*.env
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+sdist/
+wheels/
+*.egg-info/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Logs and debug files
+*.log
+*.pot
+*.out
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Testing
+htmlcov/
+.tox/
+.nox/
+.cache/
+coverage.*
+*.cover
+*.py,cover
+
+# Flask / Django files
+instance/
+*.sqlite3
+db.sqlite3
+*.db
+
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# pyenv
+.python-version
+
+# Pipenv
+Pipfile
+Pipfile.lock
+
+# mypy
+.mypy_cache/
+.dmypy.json
+
+# pytest
+.pytest_cache/
+
+# wheel and build artifacts
+*.whl
+*.manifest
+
+# Compiled and packaged files
+*.lock
+
+# Custom user files
+# *.pkl
+# health_risk_model.pkl
