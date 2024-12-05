@@ -10,7 +10,7 @@
 </head>
 
 <body class="min-h-screen w-full flex items-center justify-center p-6">
-    <div class="bg-white  p-8 w-full flex justify-around items-start">
+    <div class="bg-white  lg:p-8 p-0 w-full lg:flex block justify-center lg:justify-around lg:items-start items-center">
         <div>
             <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">HealthBuddy: Check Your Health Risk</h1>
 
@@ -41,10 +41,10 @@
             </form>
         </div>
 
-        <div class="w-[40%]">
+        <div class="lg:w-[40%] w-full">
             <!-- Result Display -->
             <div id="result" class="mt-4 text-lg text-gray-700 font-semibold"></div>
-        
+
             <!-- Visualization Table -->
             <h2 class="text-xl font-bold text-gray-800 mt-6">Your Data</h2>
             <div>
@@ -62,14 +62,14 @@
                     </tbody>
                 </table>
             </div>
-        
+
             <!-- Chart -->
             <h2 class="text-xl font-bold text-gray-800 mt-6">Risk Chart</h2>
             <div class="overflow-x-auto">
                 <canvas id="riskChart" class="mt-6 w-full"></canvas>
             </div>
         </div>
-        
+
     </div>
 
     <!-- JavaScript Section -->
@@ -116,13 +116,13 @@
             });
 
             const result = await response.json();
-    if (result.risk_level) {
-        document.getElementById("result").innerText = 
-            `Risk Level: ${result.risk_level} (Probability: ${(result.probability * 100).toFixed(2)}%)`;
-    } else {
-        document.getElementById("result").innerText = 
-            `Error: ${result.error}`;
-    }
+            if (result.risk_level) {
+                document.getElementById("result").innerText =
+                    `Risk Level: ${result.risk_level} (Probability: ${(result.probability * 100).toFixed(2)}%)`;
+            } else {
+                document.getElementById("result").innerText =
+                    `Error: ${result.error}`;
+            }
 
             // const result = await response.json();
             const riskLevel = result.risk_level || `Error: ${result.error}`;
